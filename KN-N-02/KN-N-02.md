@@ -9,7 +9,7 @@ In diesem Schritt wurde eine sinnvolle Menge an Knoten und Kanten hinzugefügt. 
 Das vollständige Cypher-Skript zur Datenerstellung ist in der Datei `neo4j_kn02_script.cypher` enthalten.
 
 ### Screenshot
-![Daten hinzufügen Screenshot](screenshots/daten_hinzufuegen.png)
+![Daten hinzufügen Screenshot](hinzu.png)
 
 ---
 ## B) Daten abfragen (20%)

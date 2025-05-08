@@ -1,0 +1,74 @@
+// A) Daten hinzufügen (20%)
+CREATE 
+    (s1:Student {firstname: "Amir", lastname: "G"}),
+    (s2:Student {firstname: "Lena", lastname: "M"}),
+    (s3:Student {firstname: "Max", lastname: "T"}),
+    (t1:Teacher {firstname: "Oliver", lastname: "Käser"}),
+    (t2:Teacher {firstname: "Sabine", lastname: "Meier"}),
+    (k1:Klasse {name: "AB1B", startyear: 2015}),
+    (k2:Klasse {name: "CD2A", startyear: 2016}),
+    (m1:Modul {name: "Mathematik", description: "Algebra"}),
+    (m2:Modul {name: "Physik", description: "Mechanik"}),
+    (s1)-[:IST_IN_DER_KLASSE]->(k1),
+    (s2)-[:IST_IN_DER_KLASSE]->(k1),
+    (s3)-[:IST_IN_DER_KLASSE]->(k2),
+    (s1)-[:HAT_NOTE {wert: 5.5}]->(m1),
+    (s2)-[:HAT_NOTE {wert: 4.0}]->(m2),
+    (k1)-[:HAT_MODUL]->(m1),
+    (k2)-[:HAT_MODUL]->(m2),
+    (t1)-[:UNTERRICHTET]->(s1),
+    (t1)-[:UNTERRICHTET_MODUL]->(m1),
+    (t2)-[:UNTERRICHTET]->(s3),
+    (t2)-[:UNTERRICHTET_MODUL]->(m2);
+
+// B) Daten abfragen (20%)
+// 1. Alle Knoten und Beziehungen abrufen
+MATCH (n)-[r]->(m) RETURN n,r,m;
+
+// 2. Alle Studenten mit einer Note größer als 5 anzeigen
+MATCH (s:Student)-[h:HAT_NOTE]->(m:Modul)
+WHERE h.wert > 5
+RETURN s, h, m;
+
+// 3. Lehrer und deren unterrichtete Module abrufen
+MATCH (t:Teacher)-[:UNTERRICHTET_MODUL]->(m:Modul)
+RETURN t.firstname, t.lastname, m.name;
+
+// 4. OPTIONALES Beispiel - Alle Studenten und deren Noten (auch wenn sie keine haben)
+MATCH (s:Student)
+OPTIONAL MATCH (s)-[h:HAT_NOTE]->(m:Modul)
+RETURN s, h, m;
+
+// C) Daten löschen (20%)
+// Ohne DETACH löschen
+MATCH (s:Student {firstname: "Amir", lastname: "G"})
+DELETE s;
+
+// Mit DETACH löschen (löscht auch alle Beziehungen)
+MATCH (s:Student {firstname: "Lena", lastname: "M"})
+DETACH DELETE s;
+
+// D) Daten verändern (20%)
+// 1. Note eines Schülers aktualisieren
+MATCH (s:Student {firstname: "Amir", lastname: "G"})-[h:HAT_NOTE]->(m:Modul {name: "Mathematik"})
+SET h.wert = 6.0;
+
+// 2. Modulbeschreibung ändern
+MATCH (m:Modul {name: "Physik"})
+SET m.description = "Thermodynamik";
+
+// 3. Schüler in eine andere Klasse verschieben
+MATCH (s:Student {firstname: "Max", lastname: "T"})-[r:IST_IN_DER_KLASSE]->(k:Klasse)
+DELETE r
+WITH s
+MATCH (k2:Klasse {name: "AB1B"})
+CREATE (s)-[:IST_IN_DER_KLASSE]->(k2);
+
+// E) Zusätzliche Klauseln (20%)
+// 1. Nutzung von COLLECT, um alle Module pro Klasse als Liste anzuzeigen
+MATCH (k:Klasse)-[:HAT_MODUL]->(m:Modul)
+RETURN k.name, COLLECT(m.name) AS Module;
+
+// 2. Nutzung von COUNT, um die Anzahl der Schüler pro Klasse zu ermitteln
+MATCH (k:Klasse)<-[:IST_IN_DER_KLASSE]-(s:Student)
+RETURN k.name, COUNT(s) AS Anzahl_Schüler;

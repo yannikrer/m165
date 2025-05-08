@@ -1,0 +1,4 @@
+USE fussball_neu;
+TRUNCATE spieler;
+TRUNCATE spiele;
+TRUNCATE mannschaften;
